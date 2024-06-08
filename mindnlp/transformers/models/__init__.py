@@ -96,6 +96,7 @@ from . import (
     luke,
     mamba,
     marian,
+    mask2former,
     mbart,
     megatron_bert,
     minicpm,
@@ -136,6 +137,7 @@ from . import (
     squeezebert,
     starcoder2,
     swiftformer,
+    swin,
     switch_transformers,
     t5,
     timesformer,
@@ -236,6 +238,7 @@ from .longformer import *
 from .luke import *
 from .mamba import *
 from .marian import *
+from .mask2former import *
 from .mbart import *
 from .megatron_bert import *
 from .minicpm import *
@@ -276,6 +279,7 @@ from .stablelm import *
 from .squeezebert import *
 from .starcoder2 import *
 from .swiftformer import *
+from .swin import *
 from .switch_transformers import *
 from .tinybert import *
 from .t5 import *
@@ -376,6 +380,7 @@ __all__.extend(longformer.__all__)
 __all__.extend(luke.__all__)
 __all__.extend(mamba.__all__)
 __all__.extend(marian.__all__)
+__all__.extend(mask2former.__all__)
 __all__.extend(mbart.__all__)
 __all__.extend(megatron_bert.__all__)
 __all__.extend(minicpm.__all__)
@@ -416,6 +421,7 @@ __all__.extend(stablelm.__all__)
 __all__.extend(squeezebert.__all__)
 __all__.extend(starcoder2.__all__)
 __all__.extend(swiftformer.__all__)
+__all__.extend(swin.__all__)
 __all__.extend(switch_transformers.__all__)
 __all__.extend(t5.__all__)
 __all__.extend(timesformer.__all__)
