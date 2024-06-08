@@ -141,6 +141,7 @@ from . import (
     swiftformer,
     switch_transformers,
     t5,
+    tapas,
     timesformer,
     tinybert,
     vipllava,
@@ -285,6 +286,7 @@ from .swiftformer import *
 from .switch_transformers import *
 from .tinybert import *
 from .t5 import *
+from .tapas import *
 from .timesformer import *
 from .vipllava import *
 from .vision_text_dual_encoder import *
@@ -427,6 +429,7 @@ __all__.extend(starcoder2.__all__)
 __all__.extend(swiftformer.__all__)
 __all__.extend(switch_transformers.__all__)
 __all__.extend(t5.__all__)
+__all__.extend(tapas.__all__)
 __all__.extend(timesformer.__all__)
 __all__.extend(tinybert.__all__)
 __all__.extend(vipllava.__all__)

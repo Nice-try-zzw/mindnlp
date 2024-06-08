@@ -123,6 +123,7 @@ CONFIG_MAPPING_NAMES = OrderedDict(
         ("swiftformer", "SwiftFormerConfig"),
         ("switch_transformers", "SwitchTransformersConfig"),
         ("t5", "T5Config"),
+        ("tapas", "TapasConfig"),
         ("timesformer", "TimesformerConfig"),
         ("vit", "ViTConfig"),
         ("vision-text-dual-encoder", "VisionTextDualEncoderConfig"),
