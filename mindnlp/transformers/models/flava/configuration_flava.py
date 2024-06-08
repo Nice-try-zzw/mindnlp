@@ -126,7 +126,7 @@ class FlavaImageConfig(PretrainedConfig):
 
     @classmethod
     def from_pretrained(cls, pretrained_model_name_or_path: Union[str, os.PathLike], **kwargs) -> "PretrainedConfig":
-        cls._set_token_in_kwargs(kwargs)
+        # cls._set_token_in_kwargs(kwargs)
 
         config_dict, kwargs = cls.get_config_dict(
             pretrained_model_name_or_path, **kwargs)
@@ -257,7 +257,7 @@ class FlavaTextConfig(PretrainedConfig):
 
     @classmethod
     def from_pretrained(cls, pretrained_model_name_or_path: Union[str, os.PathLike], **kwargs) -> "PretrainedConfig":
-        cls._set_token_in_kwargs(kwargs)
+        # cls._set_token_in_kwargs(kwargs)
 
         config_dict, kwargs = cls.get_config_dict(
             pretrained_model_name_or_path, **kwargs)
@@ -361,7 +361,7 @@ class FlavaMultimodalConfig(PretrainedConfig):
 
     @classmethod
     def from_pretrained(cls, pretrained_model_name_or_path: Union[str, os.PathLike], **kwargs) -> "PretrainedConfig":
-        cls._set_token_in_kwargs(kwargs)
+        # cls._set_token_in_kwargs(kwargs)
 
         config_dict, kwargs = cls.get_config_dict(
             pretrained_model_name_or_path, **kwargs)
@@ -447,7 +447,7 @@ class FlavaImageCodebookConfig(PretrainedConfig):
 
     @classmethod
     def from_pretrained(cls, pretrained_model_name_or_path: Union[str, os.PathLike], **kwargs) -> "PretrainedConfig":
-        cls._set_token_in_kwargs(kwargs)
+        # cls._set_token_in_kwargs(kwargs)
 
         config_dict, kwargs = cls.get_config_dict(
             pretrained_model_name_or_path, **kwargs)

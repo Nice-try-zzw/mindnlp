@@ -372,12 +372,8 @@ class FlavaTextEmbeddings(nn.Cell):
         self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
         # position_ids (1, len position emb) is contiguous in memory and exported when serialized
         self.position_embedding_type = getattr(config, "position_embedding_type", "absolute")
-        self.register_buffer(
-            "position_ids", ops.arange(config.max_position_embeddings).broadcast_to((1, -1)), persistent=False
-        )
-        self.register_buffer(
-            "token_type_ids", ops.zeros(self.position_ids.shape, dtype=mindspore.int64), persistent=False
-        )
+        self.position_ids = ops.arange(config.max_position_embeddings).broadcast_to((1, -1))
+        self.token_type_ids  = ops.zeros(self.position_ids.shape, dtype=mindspore.int64)
 
     def construct(
         self,
@@ -1195,7 +1191,7 @@ class FlavaModel(FlavaPreTrainedModel):
                 if self.multimodal_model.use_cls_token:
                     seq_len += 1
                 attention_mask_image = ops.ones(batch_size, seq_len)
-                attention_multimodal = ops.cat([attention_mask_image, attention_mask], axis=1)
+                attention_multimodal = ops.cat([attention_mask_image.astype(mindspore.int64), attention_mask], axis=1)
             else:
                 attention_multimodal = None
             multimodal_input = ops.cat([image_mm_projection, text_mm_projection], axis=1)
@@ -1305,10 +1301,10 @@ class FlavaImageCodebook(FlavaPreTrainedModel):
 
         output_blocks = OrderedDict()
         output_blocks["relu"] = nn.ReLU()
-        output_blocks["conv"] = nn.Conv2d(8 * self.hidden_size, self.vocab_size, kernel_size=1, padding=0)
+        output_blocks["conv"] = nn.Conv2d(8 * self.hidden_size, self.vocab_size, kernel_size=1, padding=0, pad_mode='pad')
 
         blocks = OrderedDict()
-        blocks["input"] = nn.Conv2d(self.input_channels, 1 * self.hidden_size, kernel_size=7, padding=3)
+        blocks["input"] = nn.Conv2d(self.input_channels, 1 * self.hidden_size, kernel_size=7, padding=3, pad_mode='pad')
         blocks["group_1"] = FlavaImageCodebookLayerGroup(
             self.num_blocks_per_group, num_layers, 1 * self.hidden_size, 1 * self.hidden_size
         )
@@ -1635,7 +1631,7 @@ class FlavaForPreTraining(FlavaPreTrainedModel):
 
             if itm_labels is not None:
                 pos_pairs = itm_labels.ne(0)
-                pos_mask = ops.where(pos_pairs.any(), pos_pairs, pos_pairs.new([True]))
+                pos_mask = ops.where(pos_pairs.any(), pos_pairs, mindspore.Tensor([True], dtype=pos_pairs.dtype))
                 if return_loss:
                     itm_loss = ops.cross_entropy(itm_logits, itm_labels)
                     itm_loss *= self.itm_weight

@@ -46,7 +46,7 @@ from ...test_modeling_common import (
 if is_mindspore_available():
     import mindspore
     from mindspore import nn, ops
-
+    mindspore.set_context(pynative_synchronize=True)
     from mindnlp.transformers import (
         FlavaForPreTraining,
         FlavaImageCodebook,
@@ -182,16 +182,16 @@ class FlavaImageModelTest(ModelTesterMixin, unittest.TestCase):
 
         for model_class in self.all_model_classes:
             model = model_class(config)
-            self.assertIsInstance(model.get_input_embeddings(), (nn.Module))
+            self.assertIsInstance(model.get_input_embeddings(), (nn.Cell))
             x = model.get_output_embeddings()
-            self.assertTrue(x is None or isinstance(x, nn.Linear))
+            self.assertTrue(x is None or isinstance(x, nn.Dense))
 
     def test_forward_signature(self):
         config, _ = self.model_tester.prepare_config_and_inputs_for_common()
 
         for model_class in self.all_model_classes:
             model = model_class(config)
-            signature = inspect.signature(model.forward)
+            signature = inspect.signature(model.construct)
             # signature.parameters is an OrderedDict => so arg_names order is deterministic
             arg_names = [*signature.parameters.keys()]
 
@@ -382,8 +382,8 @@ class FlavaTextModelTester:
             batch_size, seq_length = input_mask.shape
             rnd_start_indices = np.random.randint(1, seq_length - 1, size=(batch_size,))
             for batch_idx, start_index in enumerate(rnd_start_indices):
-                input_mask[batch_idx, :start_index] = 1
-                input_mask[batch_idx, start_index:] = 0
+                input_mask[batch_idx, :int(start_index)] = 1
+                input_mask[batch_idx, int(start_index):] = 0
 
         token_type_ids = None
 
@@ -533,8 +533,8 @@ class FlavaMultimodalModelTester:
             batch_size, seq_length = input_mask.shape
             rnd_start_indices = np.random.randint(1, seq_length - 1, size=(batch_size,))
             for batch_idx, start_index in enumerate(rnd_start_indices):
-                input_mask[batch_idx, :start_index] = 1
-                input_mask[batch_idx, start_index:] = 0
+                input_mask[batch_idx, :int(start_index)] = 1
+                input_mask[batch_idx, int(start_index):] = 0
 
         config = self.get_config()
 
@@ -597,7 +597,7 @@ class FlavaMultimodalModelTest(ModelTesterMixin, unittest.TestCase):
 
         for model_class in self.all_model_classes:
             model = model_class(config)
-            signature = inspect.signature(model.forward)
+            signature = inspect.signature(model.construct)
             # signature.parameters is an OrderedDict => so arg_names order is deterministic
             arg_names = [*signature.parameters.keys()]
 
@@ -714,7 +714,7 @@ class FlavaImageCodebookTest(ModelTesterMixin, unittest.TestCase):
 
         for model_class in self.all_model_classes:
             model = model_class(config)
-            signature = inspect.signature(model.forward)
+            signature = inspect.signature(model.construct)
             # signature.parameters is an OrderedDict => so arg_names order is deterministic
             arg_names = [*signature.parameters.keys()]
 
@@ -990,16 +990,16 @@ class FlavaForPreTrainingTester(FlavaModelTester):
         _, input_ids, token_type_ids, attention_mask = self.text_model_tester.prepare_config_and_inputs()
         config = self.get_config()
 
-        input_ids_masked = input_ids.detach().copy()
+        input_ids_masked = mindspore.Tensor(input_ids.asnumpy(), dtype=input_ids.dtype)
         input_ids_masked[:, 1:3] = 100
-        mlm_labels = input_ids.detach().copy()
+        mlm_labels = mindspore.Tensor(input_ids.asnumpy(), dtype=input_ids.dtype)
         mlm_labels[:, :] = config.ce_ignore_index
         mlm_labels[:, 1:3] = input_ids[:, 1:3]
         mim_labels = ops.randint(
-            0, self.image_model_tester.vocab_size, bool_masked_pos.size()
+            0, self.image_model_tester.vocab_size, bool_masked_pos.shape
         ).astype(mindspore.int64)
         mim_labels[bool_masked_pos.ne(True)] = config.ce_ignore_index
-        itm_labels = ops.ones(mlm_labels.size(0)).astype(mindspore.int64)
+        itm_labels = ops.ones(mlm_labels.shape[0]).astype(mindspore.int64)
 
         return config, {
             "input_ids": input_ids,
