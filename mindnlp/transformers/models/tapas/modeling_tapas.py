@@ -1687,18 +1687,20 @@ def _segment_reduce(values, index, segment_reduce_fn, name):
         out, dim=0, index=flat_index.indices.astype(mindspore.int64), src=flat_values.float(), reduce=segment_reduce_fn, include_self=False
     )
 
-    # Unflatten the values.
-    new_shape = ops.cat(
-        [
-            mindspore.Tensor(index.batch_shape(), dtype=mindspore.int64),
-            mindspore.Tensor([index.num_segments.item()], dtype=mindspore.int64),
-            mindspore.Tensor(vector_shape, dtype=mindspore.int64),
-        ],
-        axis=0,
-    )
-
+    # # Unflatten the values.
+    # new_shape = ops.cat(
+    #     [
+    #         mindspore.Tensor(index.batch_shape(), dtype=mindspore.int64),
+    #         mindspore.Tensor([index.num_segments.item()], dtype=mindspore.int64),
+    #         mindspore.Tensor(vector_shape, dtype=mindspore.int64),
+    #     ],
+    #     axis=0,
+    # )
+    new_shape = list(index.batch_shape())
+    new_shape.extend([index.num_segments.item()])
+    new_shape.extend(vector_shape)
     output_values = segment_means.view(
-        tuple( new_shape.tolist())).astype(values.dtype)
+        tuple( new_shape)).astype(values.dtype)
     output_index = range_index_map(index.batch_shape(), index.num_segments)
     return output_values, output_index
 
